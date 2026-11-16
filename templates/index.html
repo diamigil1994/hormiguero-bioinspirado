@@ -1,49 +1,129 @@
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Hormiguero Bioinspirado</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/estilos.css') }}">
+    <title>Hormiguero bioinspirado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
-
 <body>
+    <div class="contenedor">
+        <header>
+            <h1>Hormiguero bioinspirado</h1>
+            <p>Un agente que decide por qué camino llevar a sus hormigas del nido a la comida. Cada hormiga elige con una regla simple: mezcla la feromona que dejaron las demás con la cercanía del siguiente punto. Cambia las condiciones y observa cómo se adapta la colonia.</p>
+        </header>
 
-    <header>
-        <h1>🐜 Hormiguero Bioinspirado</h1>
-        <p>Agente inteligente inspirado en colonias de hormigas</p>
-    </header>
+        <div class="layout-principal">
+            <!-- Columna izquierda: Mapa, indicadores y gráfica -->
+            <div class="columna-izquierda">
+                <section class="tarjeta">
+                    <canvas id="mapaCanvas" width="790" height="430"></canvas>
+                    <div class="leyenda-mapa">
+                        <span><i class="linea-feromona"></i> Feromona (más grueso, más rastro)</span>
+                        <span><i class="linea-optima"></i> Camino óptimo de referencia (línea fina clara)</span>
+                        <span><i class="linea-cerrada"></i> Tramo cerrado</span>
+                    </div>
+                    <p id="texto-optimo" class="texto-optimo">Camino óptimo de referencia: cargando...</p>
+                </section>
 
-    <main>
+                <section class="tarjeta indicadores">
+                    <div class="metrica">
+                        <span id="ind-gen" class="valor">0</span>
+                        <span class="etiqueta">GENERACIÓN</span>
+                    </div>
+                    <div class="metrica">
+                        <span id="ind-pct" class="valor">0%</span>
+                        <span class="etiqueta">EN EL CAMINO ÓPTIMO</span>
+                    </div>
+                    <div class="metrica">
+                        <span id="ind-mejor" class="valor">-</span>
+                        <span class="etiqueta">MEJOR LONGITUD</span>
+                    </div>
+                    <div class="metrica">
+                        <span id="ind-media" class="valor">-</span>
+                        <span class="etiqueta">LONGITUD MEDIA</span>
+                    </div>
+                    <div class="metrica">
+                        <span id="ind-perdidas" class="valor">0</span>
+                        <span class="etiqueta">HORMIGAS PERDIDAS</span>
+                    </div>
+                </section>
 
-        <section class="panel">
-            <h2>Simulación de rutas</h2>
-
-            <button onclick="iniciarSimulacion()">
-                Iniciar simulación
-            </button>
-
-            <div id="resultados">
-                Esperando simulación...
+                <section class="tarjeta">
+                    <h3>Proporción de hormigas en el camino óptimo, por generación</h3>
+                    <div class="contenedor-grafica">
+                        <canvas id="grafica"></canvas>
+                    </div>
+                </section>
             </div>
-        </section>
 
-        <section class="panel">
-            <h2>Resultados por generación</h2>
-            <canvas id="grafica"></canvas>
-        </section>
+            <!-- Columna derecha: Botones y deslizadores -->
+            <aside class="columna-derecha tarjeta">
+                <div class="grid-botones">
+                    <button id="btn-pausar" class="btn-primario" onclick="alternarPausa()">Iniciar</button>
+                    <button class="btn-secundario" onclick="reiniciarSimulacion()">Reiniciar</button>
+                    <button id="btn-bloquear" class="btn-alerta" onclick="bloquearTramo()">Bloquear tramo</button>
+                    <button id="btn-atajo" class="btn-secundario" onclick="abrirAtajo()">Abrir atajo</button>
+                </div>
+                <p class="nota-controles">Bloquear corta el tramo central del camino óptimo actual (E–H). Abrir atajo habilita un tramo nuevo entre I y la comida.</p>
 
-    </main>
+                <div class="control-slider">
+                    <div class="slider-header">
+                        <label for="alpha">Peso de la feromona (α)</label>
+                        <span id="val-alpha">1</span>
+                    </div>
+                    <input type="range" id="alpha" min="0" max="5" step="0.5" value="1" oninput="actualizarEtiqueta('alpha')">
+                    <small>Cuánto le hace caso la hormiga al rastro de las demás.</small>
+                </div>
+
+                <div class="control-slider">
+                    <div class="slider-header">
+                        <label for="beta">Peso de la cercanía (β)</label>
+                        <span id="val-beta">2</span>
+                    </div>
+                    <input type="range" id="beta" min="0" max="5" step="0.5" value="2" oninput="actualizarEtiqueta('beta')">
+                    <small>Cuánto prefiere los tramos cortos.</small>
+                </div>
+
+                <div class="control-slider">
+                    <div class="slider-header">
+                        <label for="evaporacion">Evaporación (ρ)</label>
+                        <span id="val-evaporacion">0.1</span>
+                    </div>
+                    <input type="range" id="evaporacion" min="0.01" max="0.5" step="0.01" value="0.1" oninput="actualizarEtiqueta('evaporacion')">
+                    <small>Qué tan rápido se olvida el rastro viejo.</small>
+                </div>
+
+                <div class="control-slider">
+                    <div class="slider-header">
+                        <label for="num_hormigas">Hormigas por generación</label>
+                        <span id="val-num_hormigas">20</span>
+                    </div>
+                    <input type="range" id="num_hormigas" min="5" max="50" step="1" value="20" oninput="actualizarEtiqueta('num_hormigas')">
+                </div>
+
+                <div class="control-slider">
+                    <div class="slider-header">
+                        <label for="num_exploradoras">Hormigas exploradoras</label>
+                        <span id="val-num_exploradoras">2</span>
+                    </div>
+                    <input type="range" id="num_exploradoras" min="0" max="10" step="1" value="2" oninput="actualizarEtiqueta('num_exploradoras')">
+                    <small>Ignoran la feromona y prueban rutas nuevas.</small>
+                </div>
+
+                <div class="control-slider">
+                    <div class="slider-header">
+                        <label for="velocidad">Velocidad</label>
+                        <span id="val-velocidad">15</span>
+                    </div>
+                    <input type="range" id="velocidad" min="1" max="30" step="1" value="15" oninput="actualizarVelocidad()">
+                    <small>Generaciones por segundo.</small>
+                </div>
+            </aside>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script src="{{ url_for('static', filename='js/simulacion.js') }}">
-    </script>
-
+    <script src="{{ url_for('static', filename='js/simulacion.js') }}"></script>
 </body>
 </html>
