@@ -1,0 +1,50 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f4f7;
+    margin: 0;
+    color: #263238;
+}
+
+header {
+    background: #243b30;
+    color: white;
+    text-align: center;
+    padding: 25px;
+}
+
+main {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 15px;
+}
+
+.panel {
+    background: white;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #00000015;
+}
+
+button {
+    background: #34734a;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #245735;
+}
+
+#resultados {
+    margin-top: 20px;
+    line-height: 1.8;
+}
+
+canvas {
+    max-height: 350px;
+}

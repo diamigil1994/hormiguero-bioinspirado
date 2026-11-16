@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hormiguero Bioinspirado</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <h1>🐜 Hormiguero Bioinspirado</h1>
+        <p>Agente inteligente inspirado en colonias de hormigas</p>
+    </header>
+
+    <main>
+
+        <section class="panel">
+            <h2>Simulación de rutas</h2>
+
+            <button onclick="iniciarSimulacion()">
+                Iniciar simulación
+            </button>
+
+            <div id="resultados">
+                Esperando simulación...
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Resultados por generación</h2>
+            <canvas id="grafica"></canvas>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="{{ url_for('static', filename='js/simulacion.js') }}">
+    </script>
+
+</body>
+</html>
